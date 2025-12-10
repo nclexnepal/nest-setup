@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { Role } from '../roles/schemas/role.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { errorMessage } from 'src/helpers/response';
 import * as bcrypt from 'bcryptjs';
 @Injectable()
@@ -101,7 +101,9 @@ export class UsersService {
   }
 
   async findOne(id: string) {
-    const user = await this.userModel.findById(id).exec();
+    const user = await this.userModel.findById(this.changeId(id))
+      .populate('role')
+      .exec();
     if (!user) return errorMessage('User not found', 'User');
     return user;
   }
@@ -110,12 +112,16 @@ export class UsersService {
     return `This action updates a #${id} user`;
   }
 
- async remove(id: string) {
+  async remove(id: string) {
     const user = await this.userModel.findById(id);
-    if(!user) return errorMessage('User not found', 'User');
+    if (!user) return errorMessage('User not found', 'User');
     user.archive = true;
     const updatedUser = await user.save();
     return updatedUser;
-    
+
+  }
+
+  changeId(id: string): any {
+    return new Types.ObjectId(id.toString());
   }
 }

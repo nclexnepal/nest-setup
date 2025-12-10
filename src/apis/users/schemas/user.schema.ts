@@ -1,6 +1,9 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Document, Types } from "mongoose";
 
+
+export type UserDocument = User & Document;
+
 export class UserProfile {
   @Prop()
   profileIcon: string;
@@ -50,7 +53,7 @@ export class User extends Document {
   @Prop({ default: false })
   archive: boolean;
 
-  @Prop({ default: false })
+  @Prop({ default: null })
   profile: UserProfile;
 
   @Prop()
